@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Artemis Navigator — Ephemeris & Geometry Validation Tests</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Browser Importmap for pinned Three.js and astronomy-engine ES Modules -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/",
+        "astronomy-engine": "https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/esm/astronomy.js"
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="./src/tailwind.generated.css" />
+    <link rel="stylesheet" href="./src/index.css" />
+  </head>
+  <body class="bg-[#07090E] text-slate-100 min-h-screen p-6 sm:p-12 font-sans antialiased">
+    <div class="max-w-4xl mx-auto space-y-8">
+      <!-- Header -->
+      <header class="border-b border-[#1E293B] pb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3">
+            <span class="px-2.5 py-0.5 rounded bg-cyan-950 border border-cyan-800 text-cyan-300 font-mono text-xs font-bold">
+              ROUND 4
+            </span>
+            <h1 class="text-2xl font-bold text-white tracking-tight">
+              Aerospace Ephemeris & Geometry Validation Tests
+            </h1>
+          </div>
+          <p class="text-xs text-slate-400 mt-1 font-mono">
+            Automated test suite verifying SPEC_REVISED.md & DATA_AND_METHODS.md acceptance criteria.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="./index.html" class="px-3.5 py-1.5 rounded-lg bg-[#0F172A] hover:bg-[#1E293B] text-slate-200 text-xs font-semibold border border-[#1E293B] transition-colors">
+            ← Back to App
+          </a>
+          <button id="btn-run-all" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow transition-colors">
+            Re-run Validation Suite
+          </button>
+        </div>
+      </header>
+
+      <!-- Overall Test Status Banner -->
+      <div id="suite-banner" class="p-4 rounded-xl bg-cyan-950/40 border border-cyan-500/40 flex items-center justify-between font-mono text-xs">
+        <div class="flex items-center gap-2">
+          <span id="suite-indicator" class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span id="suite-status-text" class="text-cyan-200 font-bold">Executing Automated Verification Tests...</span>
+        </div>
+        <div id="suite-summary-count" class="text-slate-300">
+          Running automated acceptance tests
+        </div>
+      </div>
+
+      <!-- Test Cases Container -->
+      <div id="tests-list" class="space-y-4 font-mono text-xs">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Footer Info -->
+      <footer class="border-t border-[#1E293B] pt-4 text-[11px] text-slate-500 font-mono flex items-center justify-between">
+        <span>Artemis Lunar Landing Site Navigator · NASA Space Apps Challenge 2026</span>
+        <span>astronomy-engine@2.1.19 · three@0.169.0</span>
+      </footer>
+    </div>
+
+    <!-- Test Runner Script using unified suite -->
+    <script type="module">
+      import { runAllTests } from './tests/suite.js';
+
+      async function runTestSuite() {
+        const tests = await runAllTests();
+        renderTests(tests);
+      }
+
+      function renderTests(tests) {
+        const container = document.getElementById('tests-list');
+        const allPassed = tests.every(t => t.passed);
+
+        const banner = document.getElementById('suite-banner');
+        const indicator = document.getElementById('suite-indicator');
+        const statusText = document.getElementById('suite-status-text');
+        const countText = document.getElementById('suite-summary-count');
+
+        if (allPassed) {
+          banner.className = 'p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/50 flex items-center justify-between font-mono text-xs';
+          indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+          statusText.className = 'text-emerald-300 font-bold';
+          statusText.textContent = `All ${tests.length} Acceptance Tests PASSED`;
+          countText.textContent = `${tests.length} of ${tests.length} passed (100%)`;
+        } else {
+          banner.className = 'p-4 rounded-xl bg-rose-950/40 border border-rose-500/50 flex items-center justify-between font-mono text-xs';
+          indicator.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+          statusText.className = 'text-rose-300 font-bold';
+          statusText.textContent = 'Acceptance Tests FAILED';
+          countText.textContent = `${tests.filter(t => t.passed).length} of ${tests.length} passed`;
+        }
+
+        container.innerHTML = tests.map(t => `
+          <div class="p-5 rounded-2xl bg-[#0F172A] border ${t.passed ? 'border-emerald-500/40' : 'border-rose-500/40'} space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full ${t.passed ? 'bg-emerald-400' : 'bg-rose-400'}"></span>
+                <span class="font-bold text-white text-sm">${t.name}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-[10px] text-slate-500">${t.timeMs} ms</span>
+                <span class="px-2.5 py-0.5 rounded text-[11px] font-bold ${t.passed ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'}">
+                  ${t.passed ? 'PASS' : 'FAIL'}
+                </span>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-300 font-sans leading-relaxed">
+              ${t.description}
+            </p>
+
+            <div class="text-[11px] text-slate-400">
+              <span class="text-slate-500">Acceptance Criteria:</span> ${t.criteria}
+            </div>
+
+            <div class="p-3 rounded-xl bg-[#07090E] border border-[#1E293B] space-y-1 text-[11px] text-cyan-300">
+              ${t.measurements.map(m => `<div>• ${m}</div>`).join('')}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('btn-run-all').addEventListener('click', runTestSuite);
+      window.addEventListener('DOMContentLoaded', runTestSuite);
+    </script>
+  </body>
+</html>

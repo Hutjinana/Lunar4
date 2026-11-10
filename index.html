@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Artemis Lunar Landing Site Navigator</title>
+    <meta name="description" content="Interactive 3D Sun-Earth-Moon orbital system and lunar south-polar terrain navigator with synthetic placeholder terrain (real LOLA DEM pending) and aerospace scientific specification review for the nine Artemis III candidate regions." />
+    <meta property="og:title" content="Artemis Lunar Landing Site Navigator" />
+    <meta property="og:description" content="Interactive 3D Sun-Earth-Moon orbital system and lunar south-polar terrain navigator with synthetic placeholder terrain (real LOLA DEM pending) and aerospace scientific specification review for the nine Artemis III candidate regions." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Browser Importmap for pinned Three.js and astronomy-engine ES Modules -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/",
+        "astronomy-engine": "https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/esm/astronomy.js"
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="./src/tailwind.generated.css" />
+    <link rel="stylesheet" href="./src/index.css" />
+  </head>
+  <body class="bg-[#07090e] text-slate-100 antialiased overflow-hidden select-none">
+    <div id="root" class="w-screen h-screen overflow-hidden flex flex-col bg-[#07090e]"></div>
+    <!-- Loading state: shown until the 14.4 MB LOLA terrain file is downloaded and the app has started (removed by app.js) -->
+    <div id="app-loading" role="status" aria-live="polite" style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#07090e;color:#cbd5e1;font-family:'Plus Jakarta Sans',system-ui,sans-serif;text-align:center;padding:24px">
+      <style>@keyframes appspin{to{transform:rotate(360deg)}}</style>
+      <div style="width:38px;height:38px;border:3px solid #1e293b;border-top-color:#22d3ee;border-radius:50%;animation:appspin 0.9s linear infinite"></div>
+      <div style="font-size:15px;font-weight:600;color:#f1f5f9">Loading lunar terrain data&hellip;</div>
+      <div style="font-size:12px;color:#94a3b8;max-width:360px;line-height:1.5">The first load downloads a 14.4&nbsp;MB LOLA south-pole terrain file. This can take a moment on a slow connection.</div>
+    </div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
